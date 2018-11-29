@@ -1,0 +1,7 @@
+/.vs/
+/Debug/
+*.vcd
+*.tim
+pch.h
+pch.cpp
+*.vcxproj*
