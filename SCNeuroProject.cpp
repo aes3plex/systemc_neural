@@ -2,18 +2,26 @@
 #include "systemc.h"
 #include "core.h"
 #include "memory.h"
+#include "input.h"
 
 
 int sc_main(int argc, char* argv[]) {
+	
+	//memory memory("memory");
 	core core("core");
-	memory memory("memory");
+	input input("input");
+
 	sc_clock clk("clk", sc_time(10, SC_NS));
 	sc_signal<int> addr;
 	sc_signal<int> data;
 	sc_signal<bool> wr;
 	sc_signal<bool> rd;
-	sc_signal<int> mem_out[3];
+	sc_signal<int> input_bus[input_size];
 
+
+	input.clk_i(clk);
+	forn()
+		input.data_bo[i](input_bus[i]);
 
 	core.clk_i(clk);
 	core.addr_bo(addr);
@@ -21,6 +29,11 @@ int sc_main(int argc, char* argv[]) {
 	core.wr_o(wr);
 	core.wr_f(rd);
 
+	forn()
+		core.data_bi[i](input_bus[i]);
+
+
+	/*
 	memory.clk_i(clk);
 	memory.addr_bi(addr);
 	memory.data_bi(data);
@@ -28,9 +41,7 @@ int sc_main(int argc, char* argv[]) {
 	memory.is_wr_f(rd);
 	
 	
-	for (unsigned i(0); i < 3; i++) {
-		memory.data_bo[i](mem_out[i]);
-	}
+	*/
 	
 
 
@@ -41,12 +52,12 @@ int sc_main(int argc, char* argv[]) {
 	sc_trace(wf, wr, "wr");
 	sc_trace(wf, rd, "rd");
 	
-	for(int i(0); i < 3; i++){
-		sc_trace(wf, mem_out[i], "mem_out");
-	}
+	forn()
+		sc_trace(wf, input_bus[i], "mem_out");
+	
 	
 	sc_start(sc_time(150, SC_NS));
-	memory.get_mem();
+	core.get_local_memory();
 	//sc_start();
 	sc_close_vcd_trace_file(wf);
 

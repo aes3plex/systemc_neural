@@ -1,14 +1,15 @@
 #pragma once
 #include "systemc.h"
+#include "input.h"
 
 SC_MODULE(core) {
 
 	sc_in<bool>  clk_i;
-	sc_out<int>  addr_bo;	// adress transmition
-	sc_out<int>  data_bo;	// data transmition
-	//sc_in<int>   data_bi;	// data reception
-	sc_out<bool> wr_o;		// writing flag
-	sc_out<bool> wr_f;		// reading flag
+	sc_out<int>  addr_bo;				// adress transmition
+	sc_out<int>  data_bo;				// data transmition
+	sc_in<int>   data_bi[input_size];	// data reception
+	sc_out<bool> wr_o;					// writing flag
+	sc_out<bool> wr_f;					// reading flag
 
 
 	void bus_write(int addr, int data) {
@@ -46,15 +47,34 @@ SC_MODULE(core) {
 
 	}
 
+
+	void input_read() {
+		forn()
+			local_memory[i] = data_bi[i].read();
+	}
+
+	void get_local_memory() {
+		forn()
+			cout << local_memory[i] << " ";
+	}
+
 	SC_CTOR(core) {
 		addr_bo.initialize(0);
 		data_bo.initialize(0);
 		wr_o.initialize(0);
 		wr_f.initialize(0);
+		
+		forn()
+			local_memory[i] = 0;
 
-		SC_CTHREAD(do_it, clk_i.pos());
+		SC_METHOD(input_read);
+		forn()
+			sensitive << clk_i.pos();
+		
+		
+		//SC_CTHREAD(do_it, clk_i.pos());
 	}
 
 private:
-	int local_memory[32];
+	int local_memory[input_size];
 };

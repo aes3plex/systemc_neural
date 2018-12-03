@@ -45,10 +45,6 @@ SC_MODULE(memory) {
 		SC_METHOD(mem_read);
 		sensitive << clk_i.pos();
 		
-		SC_METHOD(mem_write);
-		for (int i(0); i < 3; i++) {
-			sensitive << clk_i.pos();
-		}
 		
 	}
 
