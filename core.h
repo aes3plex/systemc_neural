@@ -7,9 +7,11 @@ SC_MODULE(core) {
 	sc_in<bool>  clk_i;
 	sc_out<int>  addr_bo;				// adress transmition
 	sc_out<int>  data_bo;				// data transmition
-	sc_in<int>   data_bi[input_size];	// data reception
+	//sc_in<int>   data_bi[input_size];	// data reception
 	sc_out<bool> wr_o;					// writing flag
-	sc_out<bool> wr_f;					// reading flag
+	//sc_out<bool> wr_f;					// reading flag
+	static int count;
+	int core_num;
 
 
 	void bus_write(int addr, int data) {
@@ -23,16 +25,19 @@ SC_MODULE(core) {
 		
 		//wr_o.write(0);
 
-		cout << "CORE: WRITE " << endl;
-		cout << "  -> addr: " << hex << addr << endl;
-		cout << "  -> data: " << hex << data << endl;
+		cout << "CORE " << get_core_num() << ":" << endl;
+		cout << "	addr: " <<  addr << endl;
+		cout << "	data: " <<  data << endl << endl;
 	}
 
 	void do_it() {
 		wait();
-		for (int i(0); i < 3; i++) {
-			bus_write(i, i*i);
-		}
+		
+		int temp = get_core_num() * output_size;
+		for (int i = temp; i < temp + output_size; i++) 
+			bus_write(i, i);
+			
+		
 		
 		data_bo.write(0);
 		addr_bo.write(0);
@@ -40,41 +45,52 @@ SC_MODULE(core) {
 
 
 		wait();
-		wr_f.write(1);
+		//wr_f.write(1);
 		wait();
-		wr_f.write(0);
+		//wr_f.write(0);
 		//sc_stop();
 
 	}
 
-
+	/*
 	void input_read() {
 		forn()
 			local_memory[i] = data_bi[i].read();
 	}
+	*/
 
 	void get_local_memory() {
 		forn()
 			cout << local_memory[i] << " ";
 	}
 
+	int get_core_num() {
+		return core_num;
+	}
+
 	SC_CTOR(core) {
+		
+		core_num = count;
+		count++;
+
 		addr_bo.initialize(0);
 		data_bo.initialize(0);
 		wr_o.initialize(0);
-		wr_f.initialize(0);
-		
+		//wr_f.initialize(0);
+		/*
 		forn()
 			local_memory[i] = 0;
 
 		SC_METHOD(input_read);
 		forn()
 			sensitive << clk_i.pos();
+		*/
 		
-		
-		//SC_CTHREAD(do_it, clk_i.pos());
+		SC_CTHREAD(do_it, clk_i.pos());
 	}
 
 private:
 	int local_memory[input_size];
 };
+
+int core::count = 0;

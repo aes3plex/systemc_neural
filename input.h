@@ -4,7 +4,9 @@
 #include <vector>
 
 #define input_size 3
+#define output_size 3
 #define forn() for(int i(0); i < input_size; i++)
+#define foro() for(int i(0); i < output_size; i++)
 
 using namespace std;
 
