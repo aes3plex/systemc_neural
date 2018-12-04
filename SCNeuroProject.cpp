@@ -8,45 +8,51 @@
 
 int sc_main(int argc, char* argv[]) {
 	
-	//memory memory("memory");
+	memory memory("memory");
 	core core1("core1"), core2("core2");
 	bus bus("bus");
-	//input input("input");
+	input input("input");
 
 	sc_clock clk("clk", sc_time(10, SC_NS));
 	sc_signal<int> addr[2];
 	sc_signal<int> data[2];
 	sc_signal<bool> wr[2];
+	sc_signal<bool> rd;
+	sc_signal<int> to_memory;
+	sc_signal<int> input_bus[input_size];
+	sc_signal<int> out;
 
-	//sc_signal<bool> rd;
-	//sc_signal<int> input_bus[input_size];
+	
+	//INPUT
 
-	/*
 	input.clk_i(clk);
 	forn()
 		input.data_bo[i](input_bus[i]);
-*/
+
 	
-	
+	// CORE1
+
 	core1.clk_i(clk);
 	core1.addr_bo(addr[0]);
 	core1.data_bo(data[0]);
 	core1.wr_o(wr[0]);
-	
-
-
-	/*
 	forn()
 		core1.data_bi[i](input_bus[i]);
 	
-	*/
+	
+	// CORE2
+
 	core2.clk_i(clk);
 	core2.addr_bo(addr[1]);
 	core2.data_bo(data[1]);
 	core2.wr_o(wr[1]);
+	forn()
+		core2.data_bi[i](input_bus[i]);
+
+
+	// BUS
 	
 	bus.clk_i(clk);
-
 	for_bus()
 		bus.addr_bi[i](addr[i]);
 	
@@ -56,20 +62,16 @@ int sc_main(int argc, char* argv[]) {
 	for_bus()
 		bus.wr_i[i](wr[i]);
 	
-
+	bus.wr_f(rd);
+	bus.data_bo(to_memory);
 	
-	/*
-	forn()
-		core2.data_bi[i](input_bus[i]);
-
 	
+	// MEMORY + OUT 
+
 	memory.clk_i(clk);
-	memory.addr_bi(addr);
-	memory.data_bi(data);
-	memory.wr_i(wr);
 	memory.is_wr_f(rd);
-	
-	*/
+	memory.data_bo(out);
+	memory.data_bi(to_memory);
 	
 	
 
@@ -77,22 +79,29 @@ int sc_main(int argc, char* argv[]) {
 	sc_trace_file *wf = sc_create_vcd_trace_file("wave");
 	sc_trace(wf, clk, "clk");
 	
-	for_bus()
-		sc_trace(wf, addr[i], "addr");
-
-	for_bus()
-		sc_trace(wf, data[i], "data");
-
-	for_bus()
-		sc_trace(wf, wr[i], "wr");
 	
-	/*
-	forn()
-		sc_trace(wf, input_bus[i], "mem_out");
-	*/
+		sc_trace(wf, addr[0], "addr0");
+		sc_trace(wf, data[0], "data0");
+		sc_trace(wf, wr[0], "wr0");
+
+		sc_trace(wf, addr[1], "addr1");
+		sc_trace(wf, data[1], "data1");
+		sc_trace(wf, wr[1], "wr1");
+		
+		sc_trace(wf, rd, "rd");
+		sc_trace(wf, out, "out");
+	
+	sc_trace(wf, out, "out");
+	
 	
 	sc_start(sc_time(150, SC_NS));
+	cout << "Core 1 local memory: ";
+	core1.get_local_memory();
+	cout << endl << "Core 2 local memory: ";
+	core2.get_local_memory();
+	cout << endl << "Bus buffer: ";
 	bus.get_mem();
+	cout << endl << "Buffer sum: " << bus.get_buff_sum();
 	sc_close_vcd_trace_file(wf);
 
 	return(0);

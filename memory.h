@@ -8,17 +8,17 @@ using namespace std;
 SC_MODULE(memory) {
 
 	sc_in<bool>  clk_i;
-	sc_in<int>   addr_bi;				// reception from addr_bo
+	//sc_in<int>   addr_bi;				// reception from addr_bo
 	sc_in<int>   data_bi;				// reception from data_bo
-	//sc_out<int>  data_bo[output_size];	// data transmition
-	sc_in<bool>  wr_i;					// reception wr_o
+	sc_out<int>  data_bo;				// data transmition
+	//sc_in<bool>  wr_i;					// reception wr_o
 	sc_in<bool>  is_wr_f;				// reception rd_o
 	
 
 	void mem_read()
 	{
-		if (wr_i.read())
-			mem[addr_bi.read()] = data_bi.read();
+		if (is_wr_f.read())
+			data_bo.write(data_bi.read());
 	}
 	
 

@@ -29,7 +29,7 @@ SC_MODULE(input) {
 			data_bo[i].initialize(0);
 
 		forn() // Here will be dataset[i] download
-			arr[i] = i;
+			arr[i] = i + 32;
 
 		SC_METHOD(send);
 		forn()
