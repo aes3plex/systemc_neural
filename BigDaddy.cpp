@@ -52,3 +52,14 @@ vector<vector<float>> from_file(string filename, int set_size, int elements_in_s
 	return dataset;
 }
 
+vector<int> convert(vector<float> out) {
+	vector<int> int_out(out.size());
+	for (int i(0); i < int_out.size(); i++) {
+		if (out[i] > 0.90)
+			int_out[i] = 1;
+		else
+			int_out[i] = 0;
+	}
+
+	return int_out;
+} 

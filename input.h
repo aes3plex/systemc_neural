@@ -16,17 +16,16 @@ using namespace std;
 SC_MODULE(input) {
 
 	sc_in<bool>  clk_i;
-	sc_out <int> train_data_o[train_dim];
-	sc_out <int> ideal_data_o[ideal_dim];
-	sc_out <int> test_o[train_dim];
-	sc_out <bool> wr_o;
+	sc_out <int> train_data_o[train_dim];	// writing dataset
+	sc_out <int> ideal_data_o[ideal_dim];	// writing ideals
+	sc_out <int> test_o[train_dim];			// writing test
+	sc_out <bool> wr_o;						// writing flag
 
 	vector<vector<int>> train_arr;
 	vector<vector<int>> ideal_arr;
 	vector<int> test_arr;
 
-
-
+	// input main thread
 	void core_write() {
 		wait();
 		wr_o.write(1);
@@ -62,7 +61,6 @@ SC_MODULE(input) {
 		
 	}
 
-
 	SC_CTOR(input) {
 		
 		wr_o.initialize(0);
@@ -86,15 +84,15 @@ SC_MODULE(input) {
 		
 		for (int j(0); j < set_size; j++) {
 			for_train()
-				train_arr[j][i] = from_file("dataset.txt", set_size, train_dim)[j][i];
+				train_arr[j][i] = from_file("txt_files/dataset.txt", set_size, train_dim)[j][i];
 		}
 
 		for (int j(0); j < set_size; j++) {
 			for_ideal()
-				ideal_arr[j][i] = from_file("ideals.txt", set_size, ideal_dim)[j][i];
+				ideal_arr[j][i] = from_file("txt_files/ideals.txt", set_size, ideal_dim)[j][i];
 		}
 
-		ifstream fin("test_circle.txt");
+		ifstream fin("txt_files/test_triangle.txt");
 		while (!fin.eof()) {
 			for (int i(0); i < train_dim; i++) 
 				fin >> test_arr[i];
@@ -106,3 +104,5 @@ SC_MODULE(input) {
 	}
 
 };
+
+

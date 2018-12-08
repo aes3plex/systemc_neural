@@ -7,20 +7,27 @@
 SC_MODULE(core) {
 
 	sc_in<bool>  clk_i;
-	//sc_out<int>  addr_bo;				
-	//sc_out<int>  data_bo;				
-	sc_in<int>   train_data_i[train_dim];
-	sc_in<int>   ideal_data_i[ideal_dim];
-	sc_in<int>   test_i[train_dim];
-	sc_in<bool>	 wr_i;
-	
-	//sc_out<bool> wr_o;					// writing flag
-	//sc_out<bool> wr_f;					// reading flag
+	sc_in<int>   train_data_i[train_dim];	// reading dataset	
+	sc_in<int>   ideal_data_i[ideal_dim];	// reading ideals	
+	sc_in<int>   test_i[train_dim];			// reading test
+	sc_in<bool>	 wr_i;						// reading input flag
+	sc_out<bool> wr_o;						// writing output flag
+	sc_out<int>  addr_bo;					// writing address				
+	sc_out<int>  data_bo;					// writing data	
+
 	static int count;
 	int core_num;
+		
+	// print float prediction
+	void get_prediction() {
+		cout << "Prediction for core " << core_num << ": ";
+		for_ideal()
+			cout << prediction[i] << " ";
+		cout << endl;
+	}
 
-	
-	/*void bus_write(int addr, int data) {
+	// sending results to the bus 
+	void bus_write(int addr, int data) {
 
 		addr_bo.write(addr);
 		data_bo.write(data);
@@ -28,12 +35,12 @@ SC_MODULE(core) {
 
 		wait();
 	
-		cout << "CORE " << get_core_num() << ":" << endl;
+		cout << endl << "CORE " << get_core_num() << ":" << endl;
 		cout << "	addr: " <<  addr << endl;
 		cout << "	data: " <<  data << endl << endl;
-	}*/
+	}
 
-	
+	// core main thread
 	void input_read() {
 		
 		vector<float> actual;
@@ -57,9 +64,9 @@ SC_MODULE(core) {
 			wait();
 		}
 		
+		// neural net counting
 		for (int i(0); i < epochs; i++) {
 			
-			//cout << endl << endl << "epoch " << i << " core " << get_core_num() <<endl;
 			float counter = 0;
 
 			for (int j(0); j < dataset.size(); j++) {
@@ -79,25 +86,25 @@ SC_MODULE(core) {
 			}
 
 			counter /= dataset.size();
-		}
+		} 
 		
 		for_ideal()
-			cout << war(net, test)[i] << " ";
+			prediction[i] = war(net, test)[i];
 
-
-		/*
-		int temp = get_core_num() * output_size;
-		for (int i = temp, j = 0; i < temp + output_size; i++) {
-			bus_write(i, local_memory[j]);
+		int temp = get_core_num() * 3; // 3 - output_size
+		for (int i = temp, j = 0; i < temp + 3; i++) {
+			bus_write(i, convert(war(net, test))[j]);
 			j++;
-		}
+			}
+		cout << endl;
 
 		data_bo.write(0);
 		addr_bo.write(0);
 		wr_o.write(0);
-		*/
+		
 	}
 	
+	// methods for debugging
 	void get_ideal() {
 		for(int j(0); j < set_size; j++){
 			for_ideal()
@@ -106,7 +113,7 @@ SC_MODULE(core) {
 			cout << endl;
 		}
 	}
-
+	
 	void get_dataset() {
 		for (int j(0); j < set_size; j++) {
 			for_train() {
@@ -126,6 +133,7 @@ SC_MODULE(core) {
 		}
 	}
 
+	// get core number
 	int get_core_num() {
 		return core_num;
 	}
@@ -135,11 +143,10 @@ SC_MODULE(core) {
 		core_num = count;
 		count++;
 
-	/*	addr_bo.initialize(0);
+		addr_bo.initialize(0);
 		data_bo.initialize(0);
-		wr_o.initialize(0);*/
-		//wr_f.initialize(0);
-		
+		wr_o.initialize(0);
+				
 		dataset.resize(set_size);
 		for (int i(0); i < set_size; i++)
 			dataset[i].resize(train_dim);
@@ -149,16 +156,17 @@ SC_MODULE(core) {
 			ideals[i].resize(ideal_dim);
 
 		test.resize(train_dim);
+		prediction.resize(ideal_dim);
 
 		SC_CTHREAD(input_read, clk_i.pos());
-		
-		
+	
 	}
 
 private:
 	vector<vector<float>> dataset;
 	vector<vector<float>> ideals;
 	vector<float> test;
+	vector<float> prediction;
 };
 
 int core::count = 0;
