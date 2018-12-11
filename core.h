@@ -7,9 +7,9 @@
 SC_MODULE(core) {
 
 	sc_in<bool>  clk_i;
-	sc_in<int>   train_data_i[train_dim];	// reading dataset	
-	sc_in<int>   ideal_data_i[ideal_dim];	// reading ideals	
-	sc_in<int>   test_i[train_dim];			// reading test
+	sc_in<bool>   train_data_i[train_dim];	// reading dataset	
+	sc_in<bool>   ideal_data_i[ideal_dim];	// reading ideals	
+	sc_in<bool>   test_i[train_dim];		// reading test
 	sc_in<bool>	 wr_i;						// reading input flag
 	sc_out<bool> wr_o;						// writing output flag
 	sc_out<int>  addr_bo;					// writing address				
@@ -52,13 +52,13 @@ SC_MODULE(core) {
 		for (int j(0); j < set_size; j++) {
 			if (wr_i.read()) {
 				for_ideal() 
-					ideals[j][i] = ideal_data_i[i].read();
+					ideals[j][i] = (int)ideal_data_i[i].read();
 				
 				for_train()
-					dataset[j][i] = train_data_i[i].read();
+					dataset[j][i] = (int)train_data_i[i].read();
 
 				for_train()
-					test[i] = test_i[i].read();
+					test[i] = (int)test_i[i].read();
 			}
 
 			wait();

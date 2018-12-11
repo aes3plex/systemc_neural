@@ -16,9 +16,9 @@ using namespace std;
 SC_MODULE(input) {
 
 	sc_in<bool>  clk_i;
-	sc_out <int> train_data_o[train_dim];	// writing dataset
-	sc_out <int> ideal_data_o[ideal_dim];	// writing ideals
-	sc_out <int> test_o[train_dim];			// writing test
+	sc_out <bool> train_data_o[train_dim];	// writing dataset
+	sc_out <bool> ideal_data_o[ideal_dim];	// writing ideals
+	sc_out <bool> test_o[train_dim];		// writing test
 	sc_out <bool> wr_o;						// writing flag
 
 	vector<vector<int>> train_arr;
@@ -92,7 +92,7 @@ SC_MODULE(input) {
 				ideal_arr[j][i] = from_file("txt_files/ideals.txt", set_size, ideal_dim)[j][i];
 		}
 
-		ifstream fin("txt_files/test_triangle.txt");
+		ifstream fin("txt_files/test_circle.txt");
 		while (!fin.eof()) {
 			for (int i(0); i < train_dim; i++) 
 				fin >> test_arr[i];

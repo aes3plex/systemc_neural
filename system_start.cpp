@@ -20,9 +20,9 @@ int sc_main(int argc, char* argv[]) {
 	
 	sc_clock clk("clk", sc_time(10, SC_NS));
 	sc_signal<bool> is_input;				// input flag
-	sc_signal<int> train_bus[train_dim];	// dataset to input
-	sc_signal<int> ideal_bus[ideal_dim];	// ideal to input
-	sc_signal<int> test_bus[train_dim];		// test to input
+	sc_signal<bool> train_bus[train_dim];	// dataset to input
+	sc_signal<bool> ideal_bus[ideal_dim];	// ideal to input
+	sc_signal<bool> test_bus[train_dim];	// test to input
 	sc_signal<int> addr[3];					// address to bus
 	sc_signal<int> data[3];					// data to bus
 	sc_signal<bool> wr[3];					// bus flag 
