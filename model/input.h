@@ -92,7 +92,7 @@ SC_MODULE(input) {
 				ideal_arr[j][i] = from_file("txt_files/ideals.txt", set_size, ideal_dim)[j][i];
 		}
 
-		ifstream fin("txt_files/test_circle.txt");
+		ifstream fin("txt_files/test_square.txt");
 		while (!fin.eof()) {
 			for (int i(0); i < train_dim; i++) 
 				fin >> test_arr[i];
